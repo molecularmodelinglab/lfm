@@ -1,0 +1,25 @@
+
+model:
+  type: grid
+  hidden_dim: 256
+  num_layers: 3
+  nn_type: et
+
+  lig_enc_feats: 256
+  rec_enc_feats: 256
+  both_enc_feats: 256
+
+  rec_grids:
+    - channels: 32
+      spacing: 1 # angstrom
+    - channels: 128
+      spacing: 2
+    - channels: 256
+      spacing: 4
+    - channels: 512
+      spacing: 8
+
+train:
+  lr: 1e-4
+  batch_size: 128
+  check_val_every_n_epoch: 2

@@ -1,0 +1,33 @@
+ARG CUDA=11.8.0
+FROM mambaorg/micromamba:jammy-cuda-${CUDA}
+
+ARG CUDA
+ARG DATASET_ID
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+RUN micromamba config set repodata_use_zst true && micromamba config set extract_threads 1
+RUN CONDA_OVERRIDE_CUDA=${CUDA} micromamba install -y -c conda-forge \
+    python=3.10 \
+    pip \
+    && micromamba clean --all --yes
+
+COPY --chown=$MAMBA_USER ./docker/requirements/conda_train.txt /home/$MAMBA_USER/docker/requirements/conda.txt
+RUN CONDA_OVERRIDE_CUDA=${CUDA} micromamba install -y -c conda-forge --file ~/docker/requirements/conda.txt \
+    && micromamba clean --all --yes
+
+COPY --chown=$MAMBA_USER ./docker/requirements/pip_train.txt /home/$MAMBA_USER/docker/requirements/pip.txt
+RUN pip install --no-cache-dir -r ~/docker/requirements/pip.txt
+
+# RUN mkdir -p /home/$MAMBA_USER/rec_pmf_data/${DATASET_ID}
+# COPY --chown=$MAMBA_USER --from=data_dir train.csv train.h5 val.csv val.h5 /home/$MAMBA_USER/rec_pmf_data/${DATASET_ID}/    
+
+# RUN mkdir -p /home/$MAMBA_USER/plinder_benchmark/${DATASET_ID}
+# COPY --chown=$MAMBA_USER --from=plinder_benchmark_dir val.csv val.h5 /home/$MAMBA_USER/plinder_benchmark/${DATASET_ID}/
+# COPY --chown=$MAMBA_USER --from=plinder_benchmark_dir systems /home/$MAMBA_USER/plinder_benchmark/${DATASET_ID}/systems
+
+COPY --chown=$MAMBA_USER . /home/$MAMBA_USER/rec_pmf_net
+COPY --chown=$MAMBA_USER configs/docker_platform.yaml /home/$MAMBA_USER/rec_pmf_net/configs/platform.yaml
+
+WORKDIR /home/$MAMBA_USER/rec_pmf_net
+
+ENTRYPOINT [ "/usr/local/bin/_entrypoint.sh", "/home/mambauser/rec_pmf_net/docker/train.py" ]

@@ -1,0 +1,82 @@
+## conda
+
+# general
+openfe
+vina
+
+# train, screen
+torchmd-net==2.2.0
+dgl==1.1.3
+pytorch_cluster
+pytorch_scatter
+pytorch_sparse
+
+# pmf_datagen
+openmm-torch
+dgl==1.1.3
+
+# target_md, pmf_datagen
+openmmtools
+
+# screen, pmf_datagen
+openbabel
+
+# screen, target_md, pmf_datagen, train
+openmmforcefields==0.14.1
+unidock
+
+# data_compile
+graph-tool
+fastparquet
+pdbfixer
+pykdtree
+
+# all
+jax
+jaxlib
+
+## pip
+
+# all
+h5py
+pandas
+omegaconf
+rdkit==2023.9.6
+spyrmsd
+numpy==1.26.4
+tqdm
+gputil
+sqlalchemy
+sqlalchemy-cockroachdb
+psycopg2-binary
+celery[redis,sqs]
+celery-batches
+
+# target_md, pmf_datagen, train
+zarr
+fsspec
+gcsfs
+
+# screen, pmf_datagen
+meeko==0.6.0a0
+
+
+# train
+torchmetrics
+lightning
+wandb==0.18
+
+# train, screen
+terrace
+roma
+torch-cubic-spline-grids
+
+# dev
+jupyter
+runpod
+mdtraj
+vastai
+alembic
+
+# all
+# gpytorch

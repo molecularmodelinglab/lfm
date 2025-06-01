@@ -1,0 +1,36 @@
+ARG CUDA=11.8.0
+FROM mambaorg/micromamba:jammy-cuda-${CUDA}
+
+ARG CUDA
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+# install postgresql client
+USER root
+RUN apt-get update && apt-get install -y postgresql-client && apt-get clean
+
+USER $MAMBA_USER
+
+RUN micromamba config set repodata_use_zst true && micromamba config set extract_threads 1
+RUN CONDA_OVERRIDE_CUDA=${CUDA} micromamba install -y -c conda-forge \
+    python=3.10 \
+    pip \
+    && micromamba clean --all --yes
+
+COPY --chown=$MAMBA_USER ./docker/requirements/conda_pmf_datagen.txt /home/$MAMBA_USER/docker/requirements/conda.txt
+RUN CONDA_OVERRIDE_CUDA=${CUDA} micromamba install -y -c conda-forge --file ~/docker/requirements/conda.txt \
+    && micromamba clean --all --yes
+
+COPY --chown=$MAMBA_USER ./docker/requirements/pip_pmf_datagen.txt /home/$MAMBA_USER/docker/requirements/pip.txt
+RUN pip install --no-cache-dir -r ~/docker/requirements/pip.txt
+
+COPY --chown=$MAMBA_USER espaloma /home/$MAMBA_USER/espaloma
+RUN pip install --user --no-cache-dir /home/$MAMBA_USER/espaloma
+
+COPY --chown=$MAMBA_USER . /home/$MAMBA_USER/rec_pmf_net
+COPY --chown=$MAMBA_USER configs/docker_platform.yaml /home/$MAMBA_USER/rec_pmf_net/configs/platform.yaml
+
+COPY --chown=$MAMBA_USER secrets/postgresql_root.crt /home/$MAMBA_USER/.postgresql/root.crt
+
+WORKDIR /home/$MAMBA_USER/rec_pmf_net
+
+ENTRYPOINT [ "/usr/local/bin/_entrypoint.sh", "/home/mambauser/rec_pmf_net/docker/pmf_datagen.py" ]

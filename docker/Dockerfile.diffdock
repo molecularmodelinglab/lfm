@@ -1,0 +1,32 @@
+FROM rbgcsail/diffdock
+
+# install postgresql client
+USER root
+RUN apt-get update && apt-get install -y postgresql-client unzip && apt-get clean
+
+USER appuser
+
+RUN micromamba run -n diffdock pip install --no-cache-dir \
+    omegaconf \
+    sqlalchemy \
+    sqlalchemy-cockroachdb \
+    psycopg2-binary \
+    gcsfs \
+    openmm
+
+# Downloading: "https://dl.fbaipublicfiles.com/fair-esm/models/esm2_t33_650M_UR50D.pt" to /home/appuser/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D.pt
+# Downloading: "https://dl.fbaipublicfiles.com/fair-esm/regression/esm2_t33_650M_UR50D-contact-regression.pt" to /home/appuser/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D-contact-regression.pt
+ADD --chown=appuser https://dl.fbaipublicfiles.com/fair-esm/models/esm2_t33_650M_UR50D.pt /home/appuser/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D.pt
+ADD --chown=appuser https://dl.fbaipublicfiles.com/fair-esm/regression/esm2_t33_650M_UR50D-contact-regression.pt /home/appuser/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D-contact-regression.pt
+
+# ADD --chown=appuser https://github.com/gcorso/DiffDock/releases/latest/download/diffdock_models.zip /home/appuser/DiffDock/workdir/diffdock_models.zip
+ADD --chown=appuser https://github.com/gcorso/DiffDock/releases/download/v1.1/diffdock_models.zip /home/appuser/DiffDock/workdir/v1.1/diffdock_models.zip
+
+RUN cd /home/appuser/DiffDock/workdir/v1.1 && unzip diffdock_models.zip && rm diffdock_models.zip
+
+COPY --chown=appuser . /home/appuser/rec_pmf_net
+COPY --chown=appuser configs/docker_platform.yaml /home/appuser/rec_pmf_net/configs/platform.yaml
+
+WORKDIR /home/appuser/rec_pmf_net
+
+ENTRYPOINT [ "/home/appuser/rec_pmf_net/docker/diffdock.sh" ]

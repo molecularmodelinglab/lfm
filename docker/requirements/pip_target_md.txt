@@ -1,0 +1,16 @@
+omegaconf
+spyrmsd
+sqlalchemy
+celery-batches
+pandas
+rdkit==2023.9.6
+h5py
+gcsfs
+zarr
+celery[redis,sqs]
+tqdm
+gputil
+numpy==1.26.4
+psycopg2-binary
+fsspec
+sqlalchemy-cockroachdb

@@ -1,0 +1,74 @@
+dataset:
+  max_length: null
+
+chembl:
+  version: 34
+
+model:
+  type: grid
+
+  in_feats: 3
+  hidden_dim: 128
+  num_layers: 3
+  nn_type: et
+  edge_cutoff: 4.0 # angstrom
+  max_neighbors: 128
+
+  lig_enc_feats: 128
+  rec_enc_feats: 128
+  both_enc_feats: 128
+
+  dropout: 0.2
+
+  rec_grids:
+    - channels: 64
+      spacing: 2
+    - channels: 256
+      spacing: 4
+    - channels: 512
+      spacing: 8
+
+train:
+  lr: 1e-4
+  batch_size: 256
+  epochs: 300
+  val_check_interval: null
+  check_val_every_n_epoch: 2
+  log_wandb: True
+  run_name: null
+  jit: true
+  gb_lr_scale: 0.0
+
+  monitor:
+    metric: "val_mean_force_mse"
+    mode: "min"
+    save_top_k: 2
+
+scoring:
+  solv_buffer: 0.0 # angstrom
+
+eval:
+  scoring:
+    baseline: unidock
+    decoy_steps: 10
+    freq: 40
+
+  docking:
+    baseline: unidock
+    freq: 40
+    n_poses: 128
+    n_embed: 16
+    only_rescore: true
+
+loss:
+  force_weight: 1.0
+  mean_force_weight: 0.0
+  mean_torque_weight: 0.0
+
+  naive_contrastive_weight: 0.0
+  naive_contrastive_min: -50
+
+  hessian_weight: 0.0
+
+wandb:
+  project: rec-pmf

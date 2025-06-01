@@ -1,0 +1,8 @@
+unidock
+openmmforcefields==0.14.1
+dgl==1.1.3
+jax
+openmm-torch
+openbabel
+openmmtools
+jaxlib

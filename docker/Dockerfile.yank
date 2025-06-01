@@ -1,0 +1,26 @@
+ARG CUDA=11.8.0
+FROM mambaorg/micromamba:jammy-cuda-${CUDA}
+
+ARG CUDA
+ARG DATASET_ID
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+RUN micromamba config set repodata_use_zst true && micromamba config set extract_threads 1
+RUN CONDA_OVERRIDE_CUDA=${CUDA} micromamba install -y -c conda-forge \
+    python=3.9 \
+    pip \
+    yank \
+    pymbar==3.1.0 \
+    openmmtools=0.23.1 \
+    netCDF4=1.6.5 \
+    && micromamba clean --all --yes
+
+COPY --chown=$MAMBA_USER ./docker/requirements/pip_yank.txt /home/$MAMBA_USER/docker/requirements/pip.txt
+RUN pip install --no-cache-dir -r ~/docker/requirements/pip.txt
+
+COPY --chown=$MAMBA_USER . /home/$MAMBA_USER/rec_pmf_net
+COPY --chown=$MAMBA_USER configs/docker_platform.yaml /home/$MAMBA_USER/rec_pmf_net/configs/platform.yaml
+
+WORKDIR /home/$MAMBA_USER/rec_pmf_net
+
+ENTRYPOINT [ "/usr/local/bin/_entrypoint.sh", "/home/mambauser/rec_pmf_net/docker/yank.py" ]
