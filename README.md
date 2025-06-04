@@ -18,6 +18,11 @@ Once you've downloaded it, simply run:
 python -m analysis.results /path/to/downloaded/folder
 ```
 
+## Running the LFM workflow on a new target
+The data generation + training code is pretty specific to our infrasctuture and we're in the process of cleaning it up + documenting it. It currently involves orchestrating hundreds of instances on [Vast.ai](https://vast.ai/) to do the data generation and running the training on our SLURM cluster so there are a lot of moving parts. 
+
+In the meantime, please [reach out](mailto:mixarcid@unc.edu) if you're interesting in using this for your work! 
+
 ## License
 All the code is available under the MIT license.
 
