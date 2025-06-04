@@ -51,11 +51,11 @@ eval:
   scoring:
     baseline: unidock
     decoy_steps: 10
-    freq: 40
+    freq: null
 
   docking:
     baseline: unidock
-    freq: 40
+    freq: null
     n_poses: 128
     n_embed: 16
     only_rescore: true
